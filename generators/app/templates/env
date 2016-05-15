@@ -1,0 +1,3 @@
+<%= appEnvVar %>_CONFIG="development"
+<%= appEnvVar %>_DEVELOPMENT_DATABASE_URI="<% if (developmentDatabaseUri) { %><%= developmentDatabaseUri %><% } %>"
+<%= appEnvVar %>_PRODUCTION_DATABASE_URI="<% if (productionDatabaseUri) { %><%= productionDatabaseUri %><% } %>"

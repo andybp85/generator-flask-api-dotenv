@@ -10,7 +10,7 @@ function whichPython (cb) {
 }
 
 function getVirtualEnv () {
-  return process.env.VIRTUAL_ENV;
+  return process.env.VIRTUAL_ENV || process.env.CONDA_ENV_PATH;
 }
 
 function inVirtualEnv () {

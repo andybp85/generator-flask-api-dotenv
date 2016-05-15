@@ -1,14 +1,14 @@
 {
-  "name": "generator-flask-api",
-  "version": "0.4.0",
-  "description": "Yeoman generator for RESTful Flask APIs",
+  "name": "generator-flask-api-dotenv",
+  "version": "0.1.0",
+  "description": "Yeoman generator for RESTful Flask APIs utilizing Flask-DotEnv. Also includes tests from Flask Foundation.",
   "license": "MIT",
   "main": "app/index.js",
-  "repository": "ColeKettler/generator-flask-api",
+  "repository": "andybp85/generator-flask-api-dotenv",
   "author": {
-    "name": "Cole Kettler",
-    "email": "me@colekettler.com",
-    "url": "https://github.com/ColeKettler"
+    "name": "Andrew Stanish",
+    "email": "andybp85@gmail.com",
+    "url": "https://github.com/andybp85"
   },
   "scripts": {
     "ci": "grunt ci",
@@ -28,7 +28,7 @@
     "api"
   ],
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4.0.0"
   },
   "dependencies": {
     "chalk": "^1.0.0",

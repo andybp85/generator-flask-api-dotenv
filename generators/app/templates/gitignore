@@ -56,3 +56,9 @@ target/
 
 # Virtual environment
 venv
+
+# vim swap files
+*.sw*
+
+# DotEnv
+.env

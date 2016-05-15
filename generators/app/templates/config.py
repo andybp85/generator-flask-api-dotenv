@@ -1,4 +1,4 @@
-import os
+import os, tempfile
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -11,9 +11,7 @@ class Config(object):
 
 class ProductionConfig(Config):
 <% if (databaseMapper === 'sqlalchemy') { -%>
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        '<%= appEnvVar %>_PRODUCTION_DATABASE_URI'
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get('<%= appEnvVar %>_PRODUCTION_DATABASE_URI')
 <% } else { -%>
     pass
 <% } -%>
@@ -22,18 +20,16 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEBUG = True
 <% if (databaseMapper === 'sqlalchemy') { -%>
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        '<%= appEnvVar %>_DEVELOPMENT_DATABASE_URI'
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get('<%= appEnvVar %>_DEVELOPMENT_DATABASE_URI')
 <% } -%>
 
 
 class TestingConfig(Config):
     TESTING = True
 <% if (databaseMapper === 'sqlalchemy') { -%>
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        '<%= appEnvVar %>_TESTING_DATABASE_URI'
-    )
+    db_file = tempfile.NamedTemporaryFile()
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + db_file.name
+    SQLALCHEMY_ECHO = True
 <% } -%>
 
 
@@ -41,5 +37,5 @@ config = {
     'production': ProductionConfig,
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'default': ProductionConfig,
+    'default': DevelopmentConfig,
 }

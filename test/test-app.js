@@ -19,7 +19,7 @@ describe('app', function () {
   before(function (done) {
     helpers.run(path.join(__dirname, '../generators/app'))
       .withOptions({ skipInstall: true })
-      .withPrompts({ versioningScheme: 'none' })
+      .withPrompts({ versioningScheme: 'none', developmentDatabaseUri: 'postgresql://localhost/test' })
       .on('ready', function () {
         mocks.pythonMock = sandbox.mock(python);
         mocks.pythonMock
@@ -50,6 +50,7 @@ describe('app', function () {
       '.gitignore',
       '.editorconfig',
       '.yo-rc.json',
+      '.env',
       'config.py',
       'manage.py'
     ]);
@@ -91,10 +92,18 @@ describe('app', function () {
     ]);
   });
 
-  it('defaults to production config', function () {
+  it('defaults to development config', function () {
     assert.fileContent([
-      ['config.py', /'default': ProductionConfig/],
+      ['config.py', /'default': DevelopmentConfig/],
       ['manage.py', /default/]
+    ]);
+  });
+
+  it('sets .env', function () {
+    assert.fileContent([
+      ['.env', /CONFIG="development"/],
+      ['.env', /DEVELOPMENT_DATABASE_URI="postgresql:\/\/localhost\/test"/],
+      ['.env', /PRODUCTION_DATABASE_URI/]
     ]);
   });
 

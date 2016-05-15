@@ -135,8 +135,8 @@ module.exports = AllYourBase.extend({
         name: 'databaseMapper',
         message: 'Which ORM will you be using to interact with your database?',
         choices: [
-          { name: 'SQLAlchemy', value: 'sqlalchemy' },
-          { name: 'None / Other', value: 'none' }
+            { name: 'SQLAlchemy', value: 'sqlalchemy' },
+            { name: 'None / Other', value: 'none' }
         ],
         default: 'sqlalchemy'
       }, function (answers) {
@@ -146,6 +146,41 @@ module.exports = AllYourBase.extend({
 
         done();
       }.bind(this));
+    },
+
+    getDotEnv: function() {
+        var done = this.async();
+
+        this.prompt([{
+            type: 'confirm',
+            name: 'toEnvOrNot',
+            message: 'Would you like to create the .env file?',
+            default: true
+        },{
+            type: 'input',
+            name: 'developmentDatabaseUri',
+            message: 'Enter development database URI: ',
+            when: function (answers) {
+                return answers.toEnvOrNot;
+            }
+        },{
+            type: 'input',
+            name: 'productionDatabaseUri',
+            message: 'Enter production database URI: ',
+            when: function (answers) {
+                return answers.toEnvOrNot;
+            }
+        }], function (answers) {
+            this.lodash.extend(this.answers, answers);
+            this.config.set('toEnvOrNot', answers.toEnvOrNot);
+            this.templateVars.dotEnvParams = {};
+            for (var param in answers) {
+                if (answers.hasOwnProperty(param) && param !== 'toEnvOrNot' && answers.param !== '') {
+                    this.templateVars.dotEnvParams[param] = answers[param];
+                }
+            }
+            done();
+        }.bind(this));
     },
 
     chooseVersioningScheme: function () {
@@ -255,6 +290,17 @@ module.exports = AllYourBase.extend({
       );
     },
 
+    dotenv: function() {
+      /*if (! this.config.get('toEnvOrNot')) {*/
+          //return;
+      /*}*/
+      this.fs.copyTpl(
+        this.templatePath('env'),
+        this.destinationPath('.env'),
+        Object.assign(this.templateVars.dotEnvParams, {appEnvVar: this.appName.toUpperCase()})
+      );
+    },
+
     runnable: function () {
       this.fs.copyTpl(
         this.templatePath('manage.py'),
@@ -308,40 +354,51 @@ module.exports = AllYourBase.extend({
         this.templatePath('tests_init.py'),
         this.destinationPath(path.join('tests', '__init__.py'))
       );
+      this.fs.copyTpl(
+        this.templatePath('test_config.py'),
+        this.destinationPath(path.join('tests', 'test_config.py')),
+        {
+          appName: this.appName,
+          appEnvVar: this.appName.toUpperCase(),
+          databaseMapper: this.config.get('databaseMapper')
+        }
+      );
     }
   },
 
 
   install: function () {
-    if (!this.options['skip-install']) {
-      this.log(chalk.cyan('Installing dependencies...'));
-
-      python.pipInstall('flask-marshmallow', 'flask-script');
-
-      if (this.config.get('database') === 'postgresql') {
-        python.pipInstall('psycopg2');
-      }
-
-      if (this.config.get('database') === 'mysql') {
-        python.pipInstall(
-          'mysql-connector-python',
-          ['--allow-external', 'mysql-connector-python']
-        );
-      }
-
-      if (this.config.get('databaseMapper') === 'sqlalchemy') {
-        python.pipInstall(['flask-sqlalchemy', 'marshmallow-sqlalchemy']);
-      }
-
-      this.log(chalk.cyan('Writing requirements file...'));
-
-      var requirements = python.pipFreeze();
-      if (this.config.get('database') === 'mysql') {
-        requirements = '--allow-external mysql-connector-python\n' +
-          requirements;
-      }
-      this.fs.write(this.destinationPath('requirements.txt'), requirements);
+    if (this.options['skip-install']) {
+        return;
     }
+
+    this.log(chalk.cyan('Installing dependencies...'));
+
+    python.pipInstall('flask-marshmallow', 'flask-script', 'pytest', 'pytest-cov', 'mccabe', 'flake8', 'flask-dotenv');
+
+    if (this.config.get('database') === 'postgresql') {
+    python.pipInstall('psycopg2');
+    }
+
+    if (this.config.get('database') === 'mysql') {
+    python.pipInstall(
+        'mysql-connector-python',
+        ['--allow-external', 'mysql-connector-python']
+    );
+    }
+
+    if (this.config.get('databaseMapper') === 'sqlalchemy') {
+    python.pipInstall(['flask-sqlalchemy', 'marshmallow-sqlalchemy']);
+    }
+
+    this.log(chalk.cyan('Writing requirements file...'));
+
+    var requirements = python.pipFreeze();
+    if (this.config.get('database') === 'mysql') {
+    requirements = '--allow-external mysql-connector-python\n' +
+        requirements;
+    }
+    this.fs.write(this.destinationPath('requirements.txt'), requirements);
   },
 
   end: function () {
@@ -355,11 +412,11 @@ module.exports = AllYourBase.extend({
     this.log(chalk.bold('./manage.py runserver\n'));
 
     this.log(chalk.cyan(
-      'For safety\'s sake, this defaults to a production config with DEBUG ' +
-        'turned off.\nYou can change the config by setting the ' +
-        appConfigEnvVar + '\nenvironment variable to "development" in your ' +
-        'shell:'
+      'This defaults to a production config with DEBUG ' +
+        'turned on.\nYou can change the config by setting the ' +
+        appConfigEnvVar + '\nenvironment variable to "production" in your ' +
+        '.env file:'
     ));
-    this.log(chalk.bold('export ' + appConfigEnvVar + '=development\n'));
+    this.log(chalk.bold(appConfigEnvVar + '="production"\n'));
   }
 });
