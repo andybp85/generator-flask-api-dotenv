@@ -275,6 +275,13 @@ module.exports = AllYourBase.extend({
         this.templatePath('editorconfig'),
         this.destinationPath('.editorconfig')
       );
+    },
+
+    setupConfig: function() {
+      this.fs.copy(
+        this.templatePath('setup.cfg'),
+        this.destinationPath('setup.cfg')
+      );
     }
   },
 
@@ -363,6 +370,14 @@ module.exports = AllYourBase.extend({
           databaseMapper: this.config.get('databaseMapper')
         }
       );
+      this.fs.copyTpl(
+        this.templatePath('conftest.py'),
+        this.destinationPath(path.join('tests', 'conftest.py')),
+        {
+          appName: this.appName,
+          databaseMapper: this.config.get('databaseMapper')
+        }
+      );
     }
   },
 
@@ -374,7 +389,7 @@ module.exports = AllYourBase.extend({
 
     this.log(chalk.cyan('Installing dependencies...'));
 
-    python.pipInstall(['flask-marshmallow', 'flask-script', 'pytest', 'pytest-cov', 'mccabe', 'flake8', 'flask-dotenv']);
+    python.pipInstall(['flask-marshmallow', 'flask-script', 'flask-dotenv', 'pytest', 'pytest-cov', 'pytest-mccabe', 'pytest-flakes']);
 
     if (this.config.get('database') === 'postgresql') {
     python.pipInstall('psycopg2');
@@ -402,7 +417,7 @@ module.exports = AllYourBase.extend({
   },
 
   end: function () {
-    var appConfigEnvVar = this.appName.toUpperCase() + '_CONFIG';
+    //var appConfigEnvVar = this.appName.toUpperCase() + '_CONFIG';
 
     this.log(chalk.green('\nAll set!\n'));
 
@@ -413,10 +428,7 @@ module.exports = AllYourBase.extend({
 
     this.log(chalk.cyan(
       'This defaults to a production config with DEBUG ' +
-        'turned on.\nYou can change the config by setting the ' +
-        appConfigEnvVar + '\nenvironment variable to "production" in your ' +
-        '.env file:'
-    ));
-    this.log(chalk.bold(appConfigEnvVar + '="production"\n'));
+        'turned off.\nYou can change the config by running: ' ));
+    this.log(chalk.bold('app = create_app("development")\n'));
   }
 });

@@ -1,4 +1,5 @@
 import os, tempfile
+from flask.ext.dotenv import DotEnv
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -9,20 +10,27 @@ class Config(object):
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    @classmethod
+    def init_app(self, app):
+        env = DotEnv()
+        env.init_app(app, verbose_mode=True)
+
+<% if (databaseMapper === 'sqlalchemy') { -%>
+        if self.__name__ != 'TestingConfig':
+            prefix = self.__name__.replace('Config', '').upper()
+            env.alias(maps={
+                '<%= appEnvVar %>_' + prefix + '_DATABASE_URI': 'SQLALCHEMY_DATABASE_URI'
+            })
+<% } -%>
+
+
 
 class ProductionConfig(Config):
-<% if (databaseMapper === 'sqlalchemy') { -%>
-    SQLALCHEMY_DATABASE_URI = os.environ.get('<%= appEnvVar %>_PRODUCTION_DATABASE_URI')
-<% } else { -%>
     pass
-<% } -%>
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-<% if (databaseMapper === 'sqlalchemy') { -%>
-    SQLALCHEMY_DATABASE_URI = os.environ.get('<%= appEnvVar %>_DEVELOPMENT_DATABASE_URI')
-<% } -%>
 
 
 class TestingConfig(Config):
@@ -38,5 +46,5 @@ config = {
     'production': ProductionConfig,
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'default': DevelopmentConfig,
+    'default': ProductionConfig,
 }

@@ -19,15 +19,15 @@ module.exports = AllYourBase.extend({
   },
 
   writing: function () {
-    this.composeWith('flask-api:model', {
+    this.composeWith('flask-api-dotenv:model', {
       arguments: this.args,
       options: { isGeneratingResource: true }
     });
-    this.composeWith('flask-api:schema', {
+    this.composeWith('flask-api-dotenv:schema', {
       arguments: this.args,
       options: { isGeneratingResource: true }
     });
-    this.composeWith('flask-api:endpoint', {
+    this.composeWith('flask-api-dotenv:endpoint', {
       arguments: this.args,
       options: { isGeneratingResource: true }
     });

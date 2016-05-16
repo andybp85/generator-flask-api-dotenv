@@ -1,14 +1,11 @@
 #! /usr/bin/env python
-
-import os
-
 from flask.ext.script import Manager
 from flask.ext.script.commands import ShowUrls, Clean
 
 from <%= appName %> import create_app<% if (databaseMapper === 'sqlalchemy') { -%>, db<% } %>
 
 
-app = create_app(os.getenv('<%= appEnvVar %>_CONFIG', 'default'))
+app = create_app("development")
 
 manager = Manager(app)
 manager.add_command("show-urls", ShowUrls())
@@ -22,6 +19,7 @@ def make_shell_context():
     """
     return dict(app=app<% if (databaseMapper === 'sqlalchemy') { -%>, db=db<% } %>)
 
+
 <% if (databaseMapper === 'sqlalchemy') { -%>
 @manager.command
 def createdb():
@@ -31,14 +29,14 @@ def createdb():
     db.create_all()
 <% } -%>
 
+
 @manager.command
 def test():
-    """ run all your tests using py.test
+    """ flake8 and run all your tests using py.test
     """
-    from flake8.engine import get_style_guide
     import pytest
 
-    pytest.main("-x tests")
+    pytest.main("--cov=<%= appName %> --mccabe --flakes tests")
 
 
 if __name__ == '__main__':

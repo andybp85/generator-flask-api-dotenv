@@ -52,8 +52,10 @@ describe('app', function () {
       '.yo-rc.json',
       '.env',
       'config.py',
+      'setup.cfg',
       'manage.py',
-      'tests/test_config.py'
+      'tests/test_config.py',
+      'tests/conftest.py'
     ]);
   });
 
@@ -93,16 +95,15 @@ describe('app', function () {
     ]);
   });
 
-  it('defaults to development config', function () {
+  it('defaults to production config', function () {
     assert.fileContent([
-      ['config.py', /'default': DevelopmentConfig/],
+      ['config.py', /'default': ProductionConfig/],
       ['manage.py', /default/]
     ]);
   });
 
   it('sets .env', function () {
     assert.fileContent([
-      ['.env', /CONFIG="development"/],
       ['.env', /DEVELOPMENT_DATABASE_URI="postgresql:\/\/localhost\/test"/],
       ['.env', /PRODUCTION_DATABASE_URI/]
     ]);
@@ -158,9 +159,9 @@ describe('app with name', function () {
     assert.fileContent('manage.py', /from karate import/);
   });
 
-  it('namespaces the app config environment variable', function () {
-    assert.fileContent('manage.py', /os\.getenv\('KARATE_CONFIG'/);
-  });
+  /*it('namespaces the app config environment variable', function () {*/
+    //assert.fileContent('manage.py', /os\.getenv\('KARATE_CONFIG'/);
+  /*});*/
 });
 
 describe('app with virtualenv', function () {
@@ -531,5 +532,30 @@ describe('app with install without database or mapper', function () {
 
   it('creates a requirements file', function () {
     assert.noFileContent('requirements.txt', /sqlalchemy/);
+  });
+});
+
+describe('app without a .env file', function () {
+  before(function (done) {
+    helpers.run(path.join(__dirname, '../generators/app'))
+      .withOptions({ skipInstall: true })
+      .withPrompts({ toEnvOrNot: false })
+      .on('ready', function () {
+        sandbox.stub(python, 'pipInstall');
+        sandbox.stub(python, 'pipFreeze').returns('');
+        sandbox.stub(python, 'whichPython');
+        sandbox.stub(python, 'whichPip');
+        sandbox.stub(python, 'inVirtualEnv').returns(true);
+        sandbox.stub(python, 'linkActiveVirtualEnv');
+      })
+      .on('end', done);
+  });
+
+  after(function () {
+    sandbox.restore();
+  });
+
+  it('does not have a .env file', function () {
+    assert.noFile('.env');
   });
 });

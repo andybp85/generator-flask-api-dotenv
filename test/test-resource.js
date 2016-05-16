@@ -10,9 +10,9 @@ describe('resource', function () {
   before(function (done) {
     helpers.run(path.join(__dirname, '../generators/resource'))
       .withGenerators([
-        [helpers.createDummyGenerator(), 'flask-api:endpoint'],
-        [helpers.createDummyGenerator(), 'flask-api:model'],
-        [helpers.createDummyGenerator(), 'flask-api:schema'],
+        [helpers.createDummyGenerator(), 'flask-api-dotenv:endpoint'],
+        [helpers.createDummyGenerator(), 'flask-api-dotenv:model'],
+        [helpers.createDummyGenerator(), 'flask-api-dotenv:schema'],
       ])
       .withArguments('beartato')
       .withOptions({ skipInstall: true })
