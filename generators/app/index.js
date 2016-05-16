@@ -374,7 +374,7 @@ module.exports = AllYourBase.extend({
 
     this.log(chalk.cyan('Installing dependencies...'));
 
-    python.pipInstall('flask-marshmallow', 'flask-script', 'pytest', 'pytest-cov', 'mccabe', 'flake8', 'flask-dotenv');
+    python.pipInstall(['flask-marshmallow', 'flask-script', 'pytest', 'pytest-cov', 'mccabe', 'flake8', 'flask-dotenv']);
 
     if (this.config.get('database') === 'postgresql') {
     python.pipInstall('psycopg2');
