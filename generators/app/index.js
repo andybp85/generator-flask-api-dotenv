@@ -291,9 +291,9 @@ module.exports = AllYourBase.extend({
     },
 
     dotenv: function() {
-      /*if (! this.config.get('toEnvOrNot')) {*/
-          //return;
-      /*}*/
+      if (! this.config.get('toEnvOrNot')) {
+          return;
+      }
       this.fs.copyTpl(
         this.templatePath('env'),
         this.destinationPath('.env'),

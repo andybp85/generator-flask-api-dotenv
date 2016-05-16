@@ -4,7 +4,6 @@ import os
 
 from flask.ext.script import Manager, Server
 from flask.ext.script.commands import ShowUrls, Clean
-from flake8.engine import get_style_guide
 
 from <%= appName %> import create_app<% if (databaseMapper === 'sqlalchemy') { -%>, db<% } %>
 
@@ -37,7 +36,10 @@ def createdb():
 def test():
     """ run all your tests using py.test
     """
-    py.test test
+    from flake8.engine import get_style_guide
+    import pytest
+
+    pytest.main("-x tests")
 
 
 if __name__ == '__main__':
