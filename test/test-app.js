@@ -52,7 +52,8 @@ describe('app', function () {
       '.yo-rc.json',
       '.env',
       'config.py',
-      'manage.py'
+      'manage.py',
+      'tests/test_config.py'
     ]);
   });
 

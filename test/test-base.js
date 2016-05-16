@@ -7,7 +7,7 @@ var sinon = require('sinon');
 
 describe('base', function () {
   before(function () {
-    this.generator = helpers.createGenerator('flask-api:app', [
+    this.generator = helpers.createGenerator('flask-api-dotenv:app', [
       path.join(__dirname, '../generators/app')
     ]);
   });
